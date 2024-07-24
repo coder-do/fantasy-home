@@ -1,0 +1,120 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.fForm {
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 450px;
+  background-color: #232daf;
+  position: relative;
+  padding: 20px 5px;
+}
+
+.ffForm {
+  border-radius: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  width: 450px;
+  background-color: #232daf;
+  position: relative;
+  padding: 20px 5px;
+}
+
+@media only screen and (max-width:944px) {
+  .main {
+    gap: 50px;
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .fForm {
+    width: 350px;
+  }
+
+  .ffForm {
+    width: 350px;
+  }
+}
+
+.fForm>label {
+  font-size: 18px;
+  color: rgb(22, 20, 16);
+}
+
+.ffForm>label {
+  font-size: 18px;
+  color: rgb(22, 20, 16);
+}
+
+.fForm>input[type=text] {
+  width: 230px;
+  border-radius: 10px;
+  height: 25px;
+  border: none;
+  outline: none;
+  padding-left: 10px;
+}
+
+.ffForm>input[type=text] {
+  width: 230px;
+  border-radius: 10px;
+  height: 25px;
+  border: none;
+  outline: none;
+  padding-left: 10px;
+}
+
+.lable {
+  color: antiquewhite;
+  width: 65%;
+  padding-left: 20%;
+  background-color: rgb(31, 180, 180);
+  border-radius: 10px;
+}
+
+.main {
+  padding: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 100px;
+  font-family: 'Times New Roman', Times, serif;
+}
+
+button {
+  width: 20%;
+  border-radius: 5px;
+  border: none;
+}
+
+h2 {
+  font-size: 24px;
+}
+
+label {
+  font-size: 18px;
+}
+
+.main button[type=submit] {
+  margin-top: 15px;
+  width: 40%;
+  padding: 5px;
+}
+
+.main input {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.main input[type=file] {
+  font-size: 13px;
+}
