@@ -1,12 +1,11 @@
 'use client';
 
-import Image from "next/image";
-import styles from "./page.module.css";
 import Header from "./components/header";
 import { useEffect, useState } from "react";
 import { useLogin } from "./context/loginContext";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { collection, getDocs } from "firebase/firestore";
+import db from "./utils/firebase";
 
 interface Entry {
   title: string;
@@ -22,28 +21,30 @@ export default function Home() {
   const [categories, setCategories] = useState<Categories>({});
   const [activeTab, setActiveTab] = useState<string>('');
   const { isLoggedIn } = useLogin();
-  const router = useRouter();
-
-  useEffect(() => {
-    // location.reload();
-    // console.log(router.)
-  }, []);
 
   useEffect(() => {
     async function fetchCategories() {
-      try {
-        const response = await fetch('/api/fetchData');
-        if (!response.ok) {
-          throw new Error('Network response was not ok');
-        }
-        const data = await response.json();
-        setCategories(data);
-
-        const firstCategory = Object.keys(data)[0];
-        setActiveTab(firstCategory);
-      } catch (error) {
-        console.error('Error fetching categories:', error);
-      }
+      const arr: any = [];
+      getDocs(collection(db, "products"))
+        .then(data => {
+          data.forEach((doc) => {
+            arr.push(doc.data());
+          });
+          const groupedByCategory = arr.reduce((acc: any, item: any) => {
+            if (!acc[item.category]) {
+              acc[item.category] = [];
+            }
+            acc[item.category].push({
+              title: item.title,
+              image: item.image,
+              description: item.description
+            });
+            return acc;
+          }, {});
+          setCategories(groupedByCategory);
+          const firstCategory = Object.keys(groupedByCategory)[0];
+          setActiveTab(firstCategory);
+        }).catch(console.log);
     }
     fetchCategories();
   }, []);
@@ -82,9 +83,9 @@ export default function Home() {
               </div>
               <div className="banner-icons-agileinfo">
                 <ul className="agileits_social_list">
-                  <li><a href="#" className="w3_agile_facebook"><i className="fa fa-facebook" aria-hidden="true"></i></a></li>
-                  <li><a href="#" className="agile_twitter"><i className="fa fa-twitter" aria-hidden="true"></i></a></li>
-                  <li><a href="#" className="w3_agile_dribble"><i className="fa fa-dribbble" aria-hidden="true"></i></a></li>
+                  <li><a target="_blank" href="https://www.facebook.com/share/7hLqgXgjFF4z7Njz/?mibextid=qi2Omg" className="w3_agile_facebook"><i className="fa fa-facebook" aria-hidden="true"></i></a></li>
+                  <li><a target="_blank" href="https://www.instagram.com/fantasyhome2024/" className="w3_agile_dribble"><i className="fa fa-instagram" aria-hidden="true"></i></a></li>
+                  <li><a target="_blank" href="https://t.me/fantasy_home1" className="agile_twitter"><i className="fa fa-telegram" aria-hidden="true"></i></a></li>
                 </ul>
               </div>
             </div>
@@ -346,9 +347,9 @@ export default function Home() {
               <a href="#" className="hvr-rectangle-in" data-toggle="modal" data-target="#myModal1">know more</a>
             </div>
             <ul className="agileits_social_list">
-              <li><a href="#" className="w3_agile_facebook"><i className="fa fa-facebook" aria-hidden="true"></i></a></li>
-              <li><a href="#" className="agile_twitter"><i className="fa fa-twitter" aria-hidden="true"></i></a></li>
-              <li><a href="#" className="w3_agile_dribble"><i className="fa fa-dribbble" aria-hidden="true"></i></a></li>
+              <li><a target="_blank" href="https://www.facebook.com/share/7hLqgXgjFF4z7Njz/?mibextid=qi2Omg" className="w3_agile_facebook"><i className="fa fa-facebook" aria-hidden="true"></i></a></li>
+              <li><a target="_blank" href="https://www.instagram.com/fantasyhome2024/" className="w3_agile_dribble"><i className="fa fa-instagram" aria-hidden="true"></i></a></li>
+              <li><a target="_blank" href="https://t.me/fantasy_home1" className="agile_twitter"><i className="fa fa-telegram" aria-hidden="true"></i></a></li>
             </ul>
           </div>
           <div className="col-md-4 footer-grids">

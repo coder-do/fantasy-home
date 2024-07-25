@@ -852,7 +852,10 @@ a.agile_twitter,.w3ls_twitter{
 	background:#1da1f2;
 }
 a.w3_agile_dribble,.w3l_dribbble{
-	background:#ea4c89;
+	background: linear-gradient(45deg, 
+	#833ab4, 
+	#fd1d1d, 
+	#fcb045);
 }
 a.w3_agile_vimeo{
 	background:#1ab7ea;

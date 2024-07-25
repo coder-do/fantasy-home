@@ -1,6 +1,9 @@
 'use client'
 import Header from '@/app/components/header';
 import './st.css'
+import { uploadFile } from '@uploadcare/upload-client';
+import db from '@/app/utils/firebase';
+import { collection, addDoc, doc, getDoc, getDocs } from "firebase/firestore";
 
 import React, { useEffect, useState, FormEvent } from 'react';
 
@@ -22,19 +25,36 @@ const FetchData = () => {
   const [formLoading, setFormLoading] = useState<boolean>(false);
 
   useEffect(() => {
+    getData();
+  }, []);
+
+  const getData = () => {
     setLoading(true);
-    fetch('/api/fetchData')
-      .then((response) => response.json())
-      .then((data) => {
-        setData(data);
-        setCategories(Object.keys(data));
+    const arr: any = [];
+    getDocs(collection(db, "products"))
+      .then(data => {
+        data.forEach((doc) => {
+          arr.push(doc.data());
+        });
+        const groupedByCategory = arr.reduce((acc: any, item: any) => {
+          if (!acc[item.category]) {
+            acc[item.category] = [];
+          }
+          acc[item.category].push({
+            title: item.title,
+            image: item.image,
+            description: item.description
+          });
+          return acc;
+        }, {});
+        setData(groupedByCategory);
+        setCategories(Object.keys(groupedByCategory));
         setLoading(false);
-      })
-      .catch((error) => {
+      }).catch((error) => {
         setError(error.message);
         setLoading(false);
       });
-  }, []);
+  }
 
   const handleSubmit = async (e: FormEvent<HTMLFormElement>, category: string) => {
     e.preventDefault();
@@ -45,25 +65,51 @@ const FetchData = () => {
     setFormLoading(true);
 
     try {
-      const response = await fetch('/api/addEntry', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Error adding entry');
+      const fileInput = formData.get('image') as File;
+      if (!fileInput) {
+        throw new Error('No image file selected');
       }
 
-      const newEntry = await response.json();
-
-      setData((prevData: any) => {
-        if (!prevData) return { [category]: [newEntry.entry] };
-        return {
-          ...prevData,
-          [category]: prevData[category] ? [...prevData[category], newEntry.entry] : [newEntry.entry],
-        };
+      const result = await uploadFile(fileInput, {
+        publicKey: 'dbe22a4fce547e417973',
+        store: 'auto',
+        metadata: {
+          subsystem: 'js-client',
+          pet: 'cat'
+        }
       });
 
+      const imageUrl = result.cdnUrl;
+      const description = formData.get('description');
+      const title = formData.get('title');
+      const category: any = formData.get('category');
+
+      await addDoc(collection(db, "products"), {
+        title: title,
+        description: description,
+        image: imageUrl,
+        category: category
+      });
+
+      setData((prevData: any) => {
+        if (!prevData) return { [category]: [category] };
+        return {
+          ...prevData,
+          [category]: prevData[category] ? [...prevData[category], {
+            title: title,
+            description: description,
+            image: imageUrl,
+            category: category
+          }] : [{
+            title: title,
+            description: description,
+            image: imageUrl,
+            category: category
+          }],
+        };
+      });
+      setFormLoading(false);
+      getData();
       form.reset();
     } catch (error) {
       setError((error as Error).message);
@@ -88,23 +134,52 @@ const FetchData = () => {
     setFormLoading(true);
 
     try {
-      const response = await fetch('/api/addEntry', {
-        method: 'POST',
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Error adding new category');
+      const fileInput = formData.get('image') as File;
+      if (!fileInput) {
+        throw new Error('No image file selected');
       }
 
-      const newEntry = await response.json();
-      setData((prevData) => ({
-        ...prevData,
-        [newCategory]: (prevData as any)[newCategory] ? [...(prevData as any)[newCategory], newEntry.entry] : [newEntry.entry],
-      }));
+      const result = await uploadFile(fileInput, {
+        publicKey: 'dbe22a4fce547e417973',
+        store: 'auto',
+        metadata: {
+          subsystem: 'js-client',
+          pet: 'cat'
+        }
+      });
 
-      setCategories((prevCategories) => [...prevCategories, newCategory]);
+      const imageUrl = result.cdnUrl;
+      const description = formData.get('description');
+      const title = formData.get('title');
+      const category: any = formData.get('category');
+
+      await addDoc(collection(db, "products"), {
+        title: title,
+        description: description,
+        image: imageUrl,
+        category: category
+      });
+
+      setData((prevData: any) => {
+        if (!prevData) return { [category]: [category] };
+        return {
+          ...prevData,
+          [category]: prevData[category] ? [...prevData[category], {
+            title: title,
+            description: description,
+            image: imageUrl,
+            category: category
+          }] : [{
+            title: title,
+            description: description,
+            image: imageUrl,
+            category: category
+          }],
+        };
+      });
+
       form.reset();
+      getData();
     } catch (error) {
       setError((error as Error).message);
     } finally {
